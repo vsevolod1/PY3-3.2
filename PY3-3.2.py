@@ -66,8 +66,8 @@ print(my_friends_lst)
 for friend_lst in my_friends_lst:
     request_string = ''
     for friend in friend_lst:
-        request_string += 'API.friends.get({{"user_id": {}}}), '.format(friend,friend)
-    request_string = 'return [' + request_string + '];'
+        request_string += '"user": {}, "friends": API.friends.get({{"user_id": {}}}), '.format(friend,friend)
+    request_string = 'return {' + request_string + '};'
     print(request_string)
     params['code'] = request_string
     response = requests.get('https://api.vk.com/method/execute', params).json()
