@@ -1,9 +1,9 @@
 from pprint import pprint
-
-import vk
 from urllib.parse import urlencode, urlparse
 import requests
 import time
+import networkx as nx
+
 
 
 AUTHORIZE_URL = 'https://oauth.vk.com/authorize'
@@ -30,9 +30,6 @@ print(fragments)
 
 params = {'access_token': access_token,
           'v': VERSION, }
-
-# params['method'] = 'users.get'
-# params['user_ids'] = '6998, 170920, 329878025'
 
 
 def get_friend_list(user_id = None):
@@ -75,3 +72,7 @@ for friend_lst in my_friends_lst:
     all_friends.update(response)
     time.sleep(1)
     print(response)
+
+with open('export.json', 'w') as f:
+    f.write(str(all_friends))
+
