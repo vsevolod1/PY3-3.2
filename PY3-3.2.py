@@ -2,13 +2,12 @@ from pprint import pprint
 from urllib.parse import urlencode, urlparse
 import requests
 import time
-import networkx as nx
-
+import operator
 
 
 AUTHORIZE_URL = 'https://oauth.vk.com/authorize'
 VERSION = '5.63'
-APP_ID = 5948629  # Your app_id here
+APP_ID = 5948629
 
 auth_data = {
     'client_id': APP_ID,
@@ -49,15 +48,11 @@ def parts(lst, n=25):
     # разбиваем список на части - по 25 в каждой
     return [lst[i:i + n] for i in iter(range(0, len(lst), n))]
 
-# gexecute = vk_execute('users.get', 'user_ids', '6998, 170920, 329878025')
-# pprint(gexecute)
 
 my_friends = get_friend_list()
 print(my_friends)
 my_friends_lst = parts(my_friends)
 print(my_friends_lst)
-
-# return [API.friends.get({"user_id":1}), API.friends.get({"user_id":445})];
 
 all_friends = {}
 
@@ -76,3 +71,23 @@ for friend_lst in my_friends_lst:
 with open('export.json', 'w') as f:
     f.write(str(all_friends))
 
+all_friends_friends = []
+for friend in all_friends:
+    all_friends_friends.append(friend)
+    try:
+        all_friends_friends += all_friends[friend]['items']
+    except:
+        pass
+
+top_friends = {}
+for friend in all_friends_friends:
+    if friend in top_friends:
+        value = top_friends[friend]
+        top_friends[friend] = value + 1
+    else:
+        top_friends[friend] = 1
+sorted_top_friends = sorted(top_friends.items(), key=operator.itemgetter(1), reverse=True)
+
+with open ('top_friends.txt', 'w') as f:
+    f.write(str(sorted_top_friends))
+print(sorted_top_friends)
