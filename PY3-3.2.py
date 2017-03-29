@@ -20,7 +20,7 @@ auth_data = {
 
 print('?'.join((AUTHORIZE_URL, urlencode(auth_data))))
 
-token_url = 'https://oauth.vk.com/blank.html#access_token=d6c009ad7e7c72da10230b5d3d4ccb6567b6823bb0c8dde1d1a4338eadd6e8688828174b370d8bde23776&expires_in=86400&user_id=7203087'
+token_url = 'https://oauth.vk.com/blank.html#access_token=19d52aa5d2c5497bab56ad81f91faf3d75b3900f772ee620cdf42380398ef89a87361f25cf33708ae4b6e&expires_in=86400&user_id=7203087'
 
 o = urlparse(token_url)
 fragments = dict(i.split('=') for i in o.fragment.split('&'))
@@ -31,8 +31,8 @@ print(fragments)
 params = {'access_token': access_token,
           'v': VERSION, }
 
-params['method'] = 'users.get'
-params['user_ids'] = '6998, 170920, 329878025'
+# params['method'] = 'users.get'
+# params['user_ids'] = '6998, 170920, 329878025'
 
 
 def get_friend_list(user_id = None):
@@ -42,11 +42,34 @@ def get_friend_list(user_id = None):
 
 def vk_execute(method, param_name, param_value):
     frlist = [6998, 170920]
-    parametres = params
-    parametres['method']: method
-    parametres[param_name]: param_value
-    response = requests.get('https://api.vk.com/method/execute', parametres)
-    return  response.json()
+    parameters = params
+    parameters['method'] = method
+    parameters[param_name] = param_value
+    response = requests.get('https://api.vk.com/method/execute', parameters)
+    return response.json()
 
-# gexecute = vk_execute()
+def parts(lst, n=25):
+    # разбиваем список на части - по 25 в каждой
+    return [lst[i:i + n] for i in iter(range(0, len(lst), n))]
+
+# gexecute = vk_execute('users.get', 'user_ids', '6998, 170920, 329878025')
 # pprint(gexecute)
+
+my_friends = get_friend_list()
+print(my_friends)
+my_friends_lst = parts(my_friends)
+print(my_friends_lst)
+
+# return [API.friends.get({"user_id":1}), API.friends.get({"user_id":445})];
+
+
+for friend_lst in my_friends_lst:
+    request_string = ''
+    for friend in friend_lst:
+        request_string += 'API.friends.get({{"user_id": {}}}), '.format(friend,friend)
+    request_string = 'return [' + request_string + '];'
+    print(request_string)
+    params['code'] = request_string
+    response = requests.get('https://api.vk.com/method/execute', params).json()
+    time.sleep(1)
+    print(response)
